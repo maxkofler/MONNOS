@@ -10,10 +10,7 @@ use core::arch::asm;
 use alloc::{boxed::Box, vec::Vec};
 use log::{debug, info, Level, LevelFilter};
 use monnos::{
-    drivers::{
-        network::{self, NetworkDriver},
-        uart::{BlockingUART, COM_BASE},
-    },
+    drivers::uart::{BlockingUART, COM_BASE},
     interrupts,
     io::pci::{self, configuration::PCIHeader, strings::get_pci_class_string},
     log::MONNOSLogger,
@@ -93,8 +90,6 @@ extern "C" fn kernel_entry(pos_multiboot_info: u32) -> ! {
 
     interrupts::enable_interrupts();
 
-    let mut device_drivers: Vec<Box<dyn NetworkDriver>> = Vec::new();
-
     pci::enumerate_simple(|bus_number, device_number, header| {
         if let PCIHeader::Device(device) = header {
             debug!(
@@ -104,11 +99,6 @@ extern "C" fn kernel_entry(pos_multiboot_info: u32) -> ! {
                 get_pci_class_string(device.class, device.subclass, device.programming_interface),
                 device.programming_interface
             );
-
-            if let Some(driver) = network::check_pci_driver(&device) {
-                info!("Using PCI network driver!");
-                device_drivers.push(driver);
-            }
         }
     });
 

@@ -6,8 +6,6 @@ use super::io::pci::configuration::PCIDeviceHeader;
 
 pub mod uart;
 
-pub mod network;
-
 /// An interface that can be used to interact with
 /// a device
 pub enum DeviceInterface {
