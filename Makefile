@@ -2,7 +2,7 @@ CC = i686-elf-gcc
 CC_FLAGS = -g -m32 -ffreestanding -nostdlib -Wall -Wextra -Ikernel/include -Ikenrel/include/libc
 
 LD = i686-elf-ld
-LD_FLAGS = 
+LD_FLAGS =
 
 AS = i686-elf-as
 AS_FLAGS =
@@ -17,7 +17,7 @@ SYMBOLS = MONNOS.sym
 all: builddir ${OUTPUT} clean_dev
 
 build/libmonnos.a: builddir
-	cargo build -Z unstable-options --out-dir ./build
+	cargo build -Zjson-target-spec -Z unstable-options --artifact-dir ./build
 
 run: all
 	scripts/multiboot/mkiso.sh ${OUTPUT}
@@ -37,7 +37,7 @@ ${OUTPUT}: build/boot_multiboot.o build/libmonnos.a src/monnos/interrupts/irq_x8
 	@echo "LD: $@"
 	@${LD} -T linker.ld ${LD_FLAGS} -o $@ -Ttext 0x1000 $^
 
-${SYMBOLS}: build/boot_multiboot.o build/libmonnos.a 
+${SYMBOLS}: build/boot_multiboot.o build/libmonnos.a
 	@echo "SYM: $^"
 	@${LD} -T linker.ld ${LD_FLAGS} -o $@ -Ttext 0x1000 $^
 	@mv ${SYMBOLS} ${SYMBOLS}.elf
@@ -55,7 +55,7 @@ builddir:
 	@echo "CC: $^"
 	@${CC} ${CC_FLAGS} -c $^ -o $@
 
-%.asm.o: %.asm	
+%.asm.o: %.asm
 	@echo "NASM: $^"
 	@nasm $^ -f elf -o $@
 
